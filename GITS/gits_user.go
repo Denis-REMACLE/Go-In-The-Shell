@@ -14,9 +14,11 @@ import (
 )
 
 func Banner() {
-	fmt.Println("\n,---.        |        --.--|            ,---.|         |    |    \n|  _.,---.   |,---.     |  |---.,---.   `---.|---.,---.|    |    \n|   ||   |---||   |---  |  |   ||---'---    ||   ||---'|    |    \n`---'`---'   ``   '     `  `   '`---'   `---'`   '`---'`---'`---'")
+	fmt.Println(",---.        |        --.--|            ,---.|         |    |    ")
+	fmt.Println("|  _.,---.   |,---.     |  |---.,---.   `---.|---.,---.|    |    ")
+	fmt.Println("|   ||   |---||   |---  |  |   ||---'---    ||   ||---'|    |    ")
+	fmt.Println("`---'`---'   ``   '     `  `   '`---'   `---'`   '`---'`---'`---'")
 	fmt.Println("\nGo-In-The-Shell is a flexible and userfriendly backdoor")
-
 }
 
 func KeyGen() (rsa.PublicKey, rsa.PrivateKey) {

